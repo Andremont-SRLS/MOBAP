@@ -1,26 +1,56 @@
 //
 //  ContentView.swift
-//  MemoryGame
+//  Test
 //
-//  Created by André Dias on 30/09/2022.
+//  Created by André Dias on 23/09/2022.
 //
 
 import SwiftUI
 
 struct ContentView: View {
+    var viewGameModel: EmojiMemoryGame
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+             
+            HStack {
+                ForEach( viewGameModel.cards, content: { card in
+                    GeometryReader { geometry in
+                        CardView(card: card).onTapGesture {
+                            viewGameModel.choose(card: card)
+                        }
+                        .frame(height: geometry.size.width*1.3)
+                    }
+                })
+            }
+            .foregroundColor(Color.orange)
+            .padding()
+            .font((viewGameModel.cards.count < 10 ? Font.largeTitle : Font.body))
         }
-        .padding()
-    }
+    
 }
 
 struct ContentView_Previews: PreviewProvider {
+    
     static var previews: some View {
-        ContentView()
+        ContentView(viewGameModel: EmojiMemoryGame())
+    }
+}
+
+
+struct CardView: View {
+    
+    var card: MemoryGame<String>.Card
+    var body: some View {
+        ZStack{
+            if !card.isFaceUp {
+                RoundedRectangle(cornerRadius: 10.0).fill(Color.white)
+                RoundedRectangle(cornerRadius: 10.0).stroke(lineWidth: 3)
+                Text(card.content)
+            }
+            else {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10.0).fill()
+                }
+            }
+        }
     }
 }
