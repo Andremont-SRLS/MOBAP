@@ -15,23 +15,19 @@
 
 import SwiftUI
 
-class EmojiMemoryGame {
-    private var game: MemoryGame<String> = createMemoryGame(numberOfPairsOfCards: Int.random(in: 2...5))
-    private static var emojies: Array<String> = ["🍆","💦", "😩", "🔥", "💯", "😎", "🫡", "🎱", "🔫", "🏳️", "🥶", "🥸"]
-
+class EmojiMemoryGame: ObservableObject {
+    
+    @Published
+    private var game: MemoryGame<String> = createMemoryGame(numberOfPairsOfCards: Int.random(in: 2...5), theme: GameThemes.allCases.randomElement()!)
+    
+    
     // MARK: - createMemoryGame function
     
-    static func createMemoryGame(numberOfPairsOfCards: Int) -> MemoryGame<String> {
+    static func createMemoryGame(numberOfPairsOfCards: Int,theme selectedTheme: GameThemes) -> MemoryGame<String> {
         
-        var selectedEmojies: Array<String> = []
+        let selectedEmojies: Array<String> = selectedTheme.getItemList()
         
-        emojies.shuffle()
-        
-        for i in 0...numberOfPairsOfCards {
-            selectedEmojies.append(emojies[i])
-        }
-    
-        return MemoryGame<String>(numberOfPairsOfCards: numberOfPairsOfCards, cardContentFactory: { pairIndex in emojies[pairIndex] })
+        return MemoryGame<String>(numberOfPairsOfCards: numberOfPairsOfCards, selectedTheme: selectedTheme, cardContentFactory: { pairIndex in selectedEmojies[pairIndex] })
     }
     
     
@@ -41,9 +37,27 @@ class EmojiMemoryGame {
         return game.cards
     }
     
+    var themeTitle: String {
+        return "\(game.theme)"
+    }
+    
+    var themeColor: [Color] {
+        return game.theme.getThemeColor()
+    }
+    
+    var score: Int {
+        return game.scoreOfTheGame
+    }
+    
     // MARK: - Intent(s)
     
     func choose(card: MemoryGame<String>.Card) {
         game.choose(card: card)
     }
+    
+    func restartGame() {
+        game = EmojiMemoryGame.createMemoryGame(numberOfPairsOfCards: Int.random(in: 2...5), theme: GameThemes.allCases.randomElement()!)
+    }
+    
+    
 }
